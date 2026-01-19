@@ -1,0 +1,92 @@
+
+
+[
+    {
+        "id":1,
+        "name":"fiction Book",
+        "title":"a good book that engages you for hours",
+        "price":0,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":2,
+        "name":"drama Book",
+        "title":"a good book that engages you for hours",
+        "price":0,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":3,
+        "name":"facts Book",
+        "title":"a good book that engages you for hours",
+        "price":0,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":4,
+        "name":"story Book",
+        "title":"a good book that engages you for hours",
+        "price":0,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":5,
+        "name":"story Book",
+        "title":"a good book that engages you for hours",
+        "price":0,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":6,
+        "name":"story Book",
+        "title":"a good book that engages you for hours",
+        "price":0,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":7,
+        "name":"cook Book",
+        "title":"a good book that engages you for hours",
+        "price":400,
+        "category":"cooking",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":8,
+        "name":"story Book",
+        "title":"a good book that engages you for hours",
+        "price":0,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":9,
+        "name":"music Book",
+        "title":"a good book that engages you for hours",
+        "price":50,
+        "category":"music",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":10,
+        "name":"story Book",
+        "title":"a good book that engages you for hours",
+        "price":0,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    },
+    {
+        "id":11,
+        "name":"comic Book",
+        "title":"a good book that engages you for hours",
+        "price":100,
+        "category":"free",
+        "image":"./bookcard.jpg"
+    }
+]
