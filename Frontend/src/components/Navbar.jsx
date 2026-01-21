@@ -1,8 +1,23 @@
 import React from "react";
 import { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
+import Login from "./Login";
 
 const Navbar = () => {
+  const [theme,setTheme]=useState(localStorage.getItem("theme")?localStorage.getItem("theme"):"light");
+
+  useEffect(()=>{
+    localStorage.setItem("theme",theme);
+    document.documentElement.setAttribute("data-theme",theme);
+
+   
+  },[theme]);
+
+  const toggleTheme=()=>{
+    setTheme(theme==="dark"?"light":"dark");
+  };
+
+
     const navItems=(
         <>
          <li><Link to ="/">Home</Link></li>
@@ -33,7 +48,7 @@ useEffect(()=>{
 
   return (
     <div className={`max-w-screen-2xl container mx-auto md:px-20 px-4 fixed top-0 left-0 z-50 right-0 
- ${sticky?" bg-white/30 backdrop-blur-md border-b border-white/20 shadow-xl ease-in-out duration-300 transition-all":""} `}>
+ ${sticky?" bg-base-100/70 backdrop-blur-md border-b border-base-300 shadow-xl ease-in-out duration-300 transition-all":""} `}>
 
     
     <div className="navbar  shadow-sm">
@@ -101,7 +116,7 @@ useEffect(()=>{
       </div>
       <label className="swap swap-rotate">
   {/* this hidden checkbox controls the state */}
-  <input type="checkbox" className="theme-controller" value="synthwave" />
+  <input type="checkbox" className="theme-controller" checked={theme==="dark"} onChange={toggleTheme} value="synthwave" />
 
   {/* sun icon */}
   <svg
@@ -122,7 +137,8 @@ useEffect(()=>{
   </svg>
 </label>
       <div className=" ">
-        <a className="bg-black text-white p-3 rounded-md hover:bg-slate-800 duration-300 cursor-pointer shadow-[0_8px_25px_rgba(59,130,246,0.4)]">Login</a>
+        <a className="bg-black text-white p-3 rounded-md hover:bg-slate-800 duration-300 cursor-pointer shadow-[0_8px_25px_rgba(59,130,246,0.4)]" onClick={()=>document.getElementById("login_modal").showModal()}>Login</a>
+        <Login/>
       </div>
       </div>
     </div>

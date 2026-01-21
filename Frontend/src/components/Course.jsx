@@ -3,10 +3,12 @@ import Footer from './Footer'
 import List from '../../public/list.json'
 import Cards from './Cards'
 import { Link } from 'react-router-dom'
+import Navbar from './Navbar'
 const Course = () => {
     console.log(List);
   return (
     <>
+    <Navbar/>
     <div className="max-w-screen-2xl container mx-auto md:px-20 px-4 ">
         <div className='mt-28  text-center' >
             <h1 className="text-2xl md:text-4xl">welcome ,we are happy to have you <span className= "font-bold text-blue-500">here!</span></h1>
