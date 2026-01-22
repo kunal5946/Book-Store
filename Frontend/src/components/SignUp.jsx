@@ -1,71 +1,99 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import Login from './Login'
+import React from "react";
+import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import Login from "./Login";
 
 const SignUp = () => {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const onSubmit = (data) => console.log(data);
+
+  // Function to open the Login modal
+  const openLoginModal = () => {
+    const loginModal = document.getElementById("login_modal");
+    if (loginModal) loginModal.showModal();
+  };
+
   return (
-    <div className="flex h-screen items-center justify-center bg-base-200">
-      
-      <div className="relative w-[400px] p-6 rounded-lg shadow-lg bg-base-100">
-        
-        {/* Close button */}
-        <Link
-          to="/"
-          className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-        >
-          ✕
-        </Link>
+    <>
+      <div className="flex h-screen items-center justify-center">
+        <div id="signup_modal" className="border shadow-md p-5 rounded-md relative">
+          <Link
+            to="/"
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >
+            ✕
+          </Link>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <h3 className="font-bold text-lg">Signup</h3>
 
-        <h3 className="font-bold text-lg mb-4">Sign Up</h3>
+            {/* Name */}
+            <div className="mt-9 space-y-1">
+              <span>Name</span>
+              <br />
+              <input
+                type="text"
+                placeholder="Enter your name"
+                className="w-80 p-2 border rounded-md outline-none"
+                {...register("name", { required: true })}
+              />
+              <br />
+              {errors.name && <span className="text-sm text-red-500">This field is required</span>}
+            </div>
 
-        {/* name */}
-        <div className="mt-4 space-y-1">
-          <span>Enter your full name</span>
-          <input
-            type="text"
-            placeholder="Name"
-            className="w-full p-2 border rounded-md outline-none"
-          />
+            {/* Email */}
+            <div className="mt-9 space-y-1">
+              <span>Email</span>
+              <br />
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-80 p-2 border rounded-md outline-none"
+                {...register("email", { required: true })}
+              />
+              <br />
+              {errors.email && <span className="text-sm text-red-500">This field is required</span>}
+            </div>
+
+            {/* Password */}
+            <div className="mt-9 space-y-1">
+              <span>Password</span>
+              <br />
+              <input
+                type="password"
+                placeholder="Enter your password"
+                className="w-80 p-2 border rounded-md outline-none"
+                {...register("password", { required: true })}
+              />
+              <br />
+              {errors.password && <span className="text-sm text-red-500">This field is required</span>}
+            </div>
+
+            {/* Signup + Login link */}
+            <div className="mt-10 flex justify-between">
+              <button className="bg-green-200 border-none rounded p-2 w-20 transition transform-transition hover:scale-105 hover:bg-green-500">
+                Signup
+              </button>
+              <div>
+                <p className="mt-4">
+                  Have account?{" "}
+                  <button
+                    type="button"
+                    onClick={openLoginModal}
+                    className="underline text-blue-500 cursor-pointer"
+                  >
+                    Login
+                  </button>
+                </p>
+              </div>
+            </div>
+          </form>
         </div>
-
-        {/* email */}
-        <div className="mt-4 space-y-1">
-          <span>Email</span>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="w-full p-2 border rounded-md outline-none"
-          />
-        </div>
-
-        {/* password */}
-        <div className="mt-4 space-y-1">
-          <span>Password</span>
-          <input
-            type="password"
-            placeholder="Enter your password"
-            className="w-full p-2 border rounded-md outline-none"
-          />
-        </div>
-
-        {/* actions */}
-        <div className="mt-6 flex justify-between items-center">
-          <button className="bg-green-200 rounded p-2 w-20 hover:bg-green-500 transition">
-            Sign up
-          </button>
-
-          <p className="text-sm">
-            Have Account?{" "}
-            <button onClick={()=>document.getElementById("login_modal").showModal()} className="underline text-blue-500">
-              Login
-            </button>
-            <Login/>
-          </p>
-        </div>
-
       </div>
-    </div>
-  )
-}
 
-export default SignUp
+      {/* Mount the Login component */}
+      <Login />
+    </>
+  );
+};
+
+export default SignUp;
