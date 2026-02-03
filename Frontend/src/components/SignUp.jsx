@@ -1,11 +1,44 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import Login from "./Login";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthProvider";
+
 
 const SignUp = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const navigate = useNavigate();
+  const { setAuthUser}=useAuth()
+
+
+  const onSubmit = async(data) =>{
+    const userInformation={
+      fullname: data.fullname,
+      email:data.email,
+      password:data.password
+    }
+     await axios.post("http://localhost:4000/users/signup",userInformation).then(
+      (res)=>{
+        console.log(res.data)
+        if(res.data){
+          toast.success('signup successfull !')
+        }
+        localStorage.setItem( "Users",JSON.stringify(res.data.user))
+        setAuthUser(res.data.user)
+        navigate("/")
+        
+      }
+    ).catch((err)=>{
+      if(err.response){
+      console.log(err)
+      
+      toast.error(err.response.data.message)
+      }
+    })
+
+  } ;
 
   // Function to open the Login modal
   const openLoginModal = () => {
@@ -34,7 +67,7 @@ const SignUp = () => {
                 type="text"
                 placeholder="Enter your name"
                 className="w-80 p-2 border rounded-md outline-none"
-                {...register("name", { required: true })}
+                {...register("fullname", { required: true })}
               />
               <br />
               {errors.name && <span className="text-sm text-red-500">This field is required</span>}
