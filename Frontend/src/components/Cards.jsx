@@ -4,6 +4,11 @@ function Cards({item}) {
     
   return (
    <>
+   <a 
+   href={`http://localhost:4000${item.pdf}`} 
+   target="_blank"
+   rel="noopener noreferrer"
+   >
    <div>
     <div className="  border-[2px] my-2 p-3 card bg-base-96 shadow-xl w-full shadow-sm">
   <figure>
@@ -24,7 +29,8 @@ function Cards({item}) {
   </div>
 </div>
    </div>
-   </> 
+   </a> 
+   </>
   )
 }
 

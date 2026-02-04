@@ -10,6 +10,8 @@ import  { useState, useEffect } from 'react';
 const Course = () => {
     
     const [book,setBook]= useState([])
+    
+    const[searchTerm,setSearchTerm]=useState("")
     useEffect(()=>{
         const getBook=async ()=>{
             try {

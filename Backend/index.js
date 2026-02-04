@@ -17,11 +17,11 @@ const URI=process.env.mongoDBURI
 //connect to mongodb
 mongoose.connect(URI).then(()=>console.log("mongo DB connected")).catch(err=>console.log("error is :",err))
 
-
+app.use("/pdfs" ,express.static("public/pdfs"))
 //defining routes
 app.use("/book",bookRoute)
 app.use("/users",userroute)
-
+  
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)  
