@@ -5,10 +5,12 @@ import Login from "./Login";
 import { useAuth } from "../context/AuthProvider";
 import Logout from "./Logout";
 
-const Navbar = () => {
+const Navbar = ({onSearch}) => {
 
+  
   const {authUser,setAuthUser}= useAuth()
   console.log(authUser)
+
 
   const [theme,setTheme]=useState(localStorage.getItem("theme")?localStorage.getItem("theme"):"light");
 
@@ -118,7 +120,15 @@ useEffect(()=>{
       <path d="m21 21-4.3-4.3"></path>
     </g>
   </svg>
-  <input type="search" required placeholder="Search" />
+  <input type="search" required placeholder="Search"
+      onChange={
+        (e)=>{
+          if(onSearch){
+          onSearch(e.target.value)
+          }
+        }
+      }
+    />
 </label>
       </div>
       <label className="swap swap-rotate">

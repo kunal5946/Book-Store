@@ -12,6 +12,7 @@ const Course = () => {
     const [book,setBook]= useState([])
     
     const[searchTerm,setSearchTerm]=useState("")
+
     useEffect(()=>{
         const getBook=async ()=>{
             try {
@@ -24,9 +25,15 @@ const Course = () => {
         }
         getBook();
     },[])
+
+    const searchedBooks=
+        book.filter((item)=>item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    
+
+    
   return (
     <>
-    <Navbar/>
+    <Navbar onSearch={setSearchTerm} />
     <div className="max-w-screen-2xl container mx-auto md:px-20 px-4 ">
         <div className='mt-28  text-center' >
             <h1 className="text-2xl md:text-4xl">welcome ,we are happy to have you <span className= "font-bold text-blue-500">here!</span></h1>
@@ -35,7 +42,7 @@ const Course = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 ">
         
             {
-                book.map(
+                searchedBooks.map(
                     (item)=>{
                         const paidItem= {...item, category:'paid'};
                         return(
