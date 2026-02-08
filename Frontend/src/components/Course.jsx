@@ -2,25 +2,38 @@ import React from 'react'
 import Footer from './Footer'
 import List from '../../public/list.json'
 import Cards from './Cards'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Navbar from './Navbar'
 import axios from "axios"
 import  { useState, useEffect } from 'react';
+import toast from 'react-hot-toast'
 
 const Course = () => {
+    const navigate=useNavigate()
     
     const [book,setBook]= useState([])
     
     const[searchTerm,setSearchTerm]=useState("")
 
     useEffect(()=>{
+        const token=localStorage.getItem("token")
         const getBook=async ()=>{
             try {
-               const res= await axios.get("http://localhost:4000/book")
+               const res= await axios.get("http://localhost:4000/book",{
+                headers:{
+                    Authorization: `Bearer ${token}`,
+                },
+               })
                console.log(res.data)
                setBook(res.data)
             } catch (error) {
                 console.log(error)
+                if(error.response && error.response.status==401){
+                    toast.error("Session expired. Please login again")
+                    localStorage.removeItem("Users")
+                    localStorage.removeItem("token")
+                    navigate("/signup")
+                }
             }
         }
         getBook();
@@ -38,7 +51,33 @@ const Course = () => {
         <div className='mt-28  text-center' >
             <h1 className="text-2xl md:text-4xl">welcome ,we are happy to have you <span className= "font-bold text-blue-500">here!</span></h1>
         </div>
+        <br/>
+        <br/>
+        <div >
+           <div className="hover-3d ">
+                {/* content */}
+                <figure className="max-w-100 rounded-2xl">
+                    <button
+                        onClick={()=>navigate("/Upload")}
+                        className="shadow-xl bg-blue-500 text-white  px-4 py-5 rounded transition transform:transition hover:scale-5px "
+                    >
+                    Contribute a  Book
+                    </button>
 
+                </figure>
+                {/* 8 empty divs needed for the 3D effect */}
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                </div>
+        </div>
+        <br/>
+       
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 ">
         
             {

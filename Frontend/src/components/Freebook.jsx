@@ -6,12 +6,13 @@ import Slider from "react-slick";
 import Cards from './Cards'
 import axios from 'axios';
 import {useState,useEffect} from 'react'
+
 const Freebook = () => {
   const [book,setBook]= useState([])
     useEffect(()=>{
         const getBook=async ()=>{
             try {
-               const res= await axios.get("http://localhost:4000/book")
+               const res= await axios.get("http://localhost:4000/book/free")
                console.log(res.data.filter(
                 (data)=>data.category==="free"))
 

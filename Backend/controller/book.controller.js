@@ -12,3 +12,13 @@ console.log("GET /book was called");
             res.status(500).json(error)
     }
 }
+
+export const getFreebooks= async(req,res)=>{
+    try{
+        const book= await Book.find()
+        res.status(200).json(book)
+    }
+    catch(error){
+        res.status(500).json(error)
+    }
+}

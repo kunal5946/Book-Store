@@ -6,6 +6,14 @@ const bookSchema=mongoose.Schema({
     category:String,
     image:String,
     title:String,
+    uploadedBy:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
+    },
+    createdAt:{
+        type:Date,
+        default:Date.now
+    }
 
 });
 

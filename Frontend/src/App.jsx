@@ -7,6 +7,7 @@ import SignUp from './components/SignUp'
 import Login from './components/Login'
 import {Toaster} from "react-hot-toast"
 import { useAuth } from './context/AuthProvider'
+import Upload from './components/Upload'
 function App() {
 
   const {authUser,setAuthUser}= useAuth()
@@ -24,6 +25,7 @@ function App() {
       <Route path="/" element={<Home/>}/>
       <Route path="/course" element ={authUser?<Course/> : <Navigate to ="/signup"/>} />
       <Route path="/signup" element={<SignUp/>}/>
+      <Route path="/Upload" element={<Upload/>}/>
       
     </Routes>
 
