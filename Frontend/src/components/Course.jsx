@@ -7,6 +7,7 @@ import Navbar from './Navbar'
 import axios from "axios"
 import  { useState, useEffect } from 'react';
 import toast from 'react-hot-toast'
+import TextType from './TextType';
 
 const Course = () => {
     const navigate=useNavigate()
@@ -49,7 +50,22 @@ const Course = () => {
     <Navbar onSearch={setSearchTerm} />
     <div className="max-w-screen-2xl container mx-auto md:px-20 px-4 ">
         <div className='mt-28  text-center' >
-            <h1 className="text-2xl md:text-4xl">welcome ,we are happy to have you <span className= "font-bold text-blue-500">here!</span></h1>
+            <h1 className="text-2xl md:text-4xl">
+                <TextType 
+                    text={["welcome ,we are happy to have you here ! "]}
+                    typingSpeed={75}
+                    pauseDuration={1500}
+                    showCursor
+                    cursorCharacter="_"
+                    
+                    deletingSpeed={50}
+                    variableSpeedEnabled={false}
+                    variableSpeedMin={60}
+                    variableSpeedMax={120}
+                    cursorBlinkDuration={0.5}
+                    />  
+                 
+                </h1>
         </div>
         <br/>
         <br/>
