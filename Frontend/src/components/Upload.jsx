@@ -1,13 +1,51 @@
-import React, { useRef } from "react";
+import React, {useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import LaserFlow from "./LaserFlow";
+import toast from "react-hot-toast";
+import axios from "axios";
+
 
 const Upload = () => {
-  const revealImgRef = useRef(null);
+  
+  const [title,setTitle]=useState("");
+    const[name,setName]=useState("");
+    const[file,setFile]=useState(null);
 
+  const handleUpload= async (e) => {
+    e.preventDefault();
+    if (!file) {
+      toast.error("Select a file");
+      return;
+    }
+ const loadingToast = toast.loading("Uploading...");
+   try {
+      const formdata = new FormData();
+      formdata.append("title", title);
+      formdata.append("name", name);
+      formdata.append("pdf", file);
+      const token = localStorage.getItem("token");
+
+      
+      await axios.post("http://localhost:4000/book/upload", formdata, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+      });
+      toast.dismiss(loadingToast);
+      toast.success("uploaded");
+    } catch (error) {
+        console.log(error.response?.data);
+        toast.dismiss(loadingToast);
+        toast.error("upload failed");
+      }
+  }
+  
   return (
+    
     <>
+    
+    
       <Navbar />
 
       {/* Header Section with LaserFlow Background */}
@@ -64,7 +102,7 @@ const Upload = () => {
 
 
             {/* FORM */}
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleUpload}>
               {/* Book name */}
               <div>
                 <label className="label">
@@ -74,6 +112,10 @@ const Upload = () => {
                   type="text"
                   placeholder="enter book title"
                   className="input input-bordered w-full"
+                  onChange={(e)=>{
+                      setName(e.target.value);
+                   }
+                  }
                 />
               </div>
 
@@ -86,6 +128,10 @@ const Upload = () => {
                   type="text"
                   placeholder="enter author's name"
                   className="input input-bordered w-full"
+                  onChange={(e)=>{
+                      setTitle(e.target.value)
+                    }
+                  }
                 />
               </div>
 
@@ -94,11 +140,17 @@ const Upload = () => {
                 <label className="label">
                   <span className="label-text py-1">Upload PDF</span>
                 </label>
-                <input type="file" className="file-input file-input-primary w-full" />
+                <input type="file" name="pdf"  className="file-input file-input-primary w-full"
+                  onChange={
+                    (e)=>{
+                      setFile(e.target.files[0])
+                    }
+                  }
+                />
               </div>
 
               {/* BUTTON */}
-              <button className="btn btn-primary w-full text-lg hover:scale-[1.04] transition">
+              <button  type="submit" className="btn btn-primary w-full text-lg hover:scale-[1.04] transition">
                 Upload Book
               </button>
             </form>

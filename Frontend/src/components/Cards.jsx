@@ -11,14 +11,14 @@ function Cards({ item }) {
        
     >
       <a
-        href={`http://localhost:4000${item.pdf}`}
+        href={`https://docs.google.com/gview?url=${item.pdf}&embedded=true`}
         target="_blank"
         rel="noopener noreferrer"
         className="block"
       >
         <div className="border-[2px] my-2 p-3 card bg-base-96 shadow-xl w-full hover:scale-[1.01] transition">
           <figure>
-            <img src={item.image} alt={item.name} />
+            <img src={item.image || "/bookcard.jpg"} alt={item.name} />
           </figure>
 
           <div className="card-body">

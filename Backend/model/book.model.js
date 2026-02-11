@@ -6,6 +6,8 @@ const bookSchema=mongoose.Schema({
     category:String,
     image:String,
     title:String,
+    pdf:String,
+    pdfPublicId:String,
     uploadedBy:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"

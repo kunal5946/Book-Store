@@ -96,9 +96,9 @@ const Navbar = ({ onSearch }) => {
             </ul>
           </div>
 
-          <a className="text-2xl font-bold cursor-pointer ml-2">
+          <Link to="/" className="text-2xl font-bold cursor-pointer ml-2">
             Book Store
-          </a>
+          </Link>
         </div>
         <div className="navbar-end space-x-3">
 
