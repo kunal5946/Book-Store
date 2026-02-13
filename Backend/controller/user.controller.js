@@ -1,6 +1,8 @@
 import User  from "../model/user.model.js"
 import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
+import cloudinary from "../config/cloudinary.js";
+
 
 export const  signup= async(req,res)=>{
     try {
@@ -81,4 +83,42 @@ export const login =async (req,res)=>{
         console.log("error",error.message)
         res.status(500).json({message:"internal server error"})
     }
+}
+
+export const uploadProfilepic= async (req,res)=>{
+ try {
+    if(!file){
+        return res.status(400).json({message:"no image file uploaded"});
+
+    }
+    const user = await User.findOne("req.user.id");
+    
+    if(user.profilePicId){
+        await cloudinary.uploader.destroy(user.profilePicId);
+    }
+
+    const result=new Promise((resolve,reject)=>{
+        const stream=cloudinary.uploader.upload_stream(
+                {
+                folder:"pfps",
+                transformation:[{width:300,height:300,crop:"fill"}]
+                },
+            //callback
+            (err,result)=>{
+                if(result)resolve(result);
+                else reject(err);
+            }
+
+         )
+         stream.end(req.file.buffer);
+    });
+    user.profilePic = result.secure_url;
+    user.profilePicId = result.public_id;
+    await user.save();
+     res.json(user);
+
+ } catch (error) {
+    console.log(err);
+    res.status(500).json({ msg: "Upload failed" });
+ }
 }
