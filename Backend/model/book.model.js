@@ -15,7 +15,16 @@ const bookSchema=mongoose.Schema({
     createdAt:{
         type:Date,
         default:Date.now
+    },
+    genre: {
+    type: [String],
+    default: []
+    },
+    tags: {
+    type: [String],
+    default: []
     }
+
 
 });
 

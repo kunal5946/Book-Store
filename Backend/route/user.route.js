@@ -5,6 +5,6 @@
     const router=express.Router()
     router.post("/signup",signup)
     router.post("/login",login)
-    router.post("/upload-pfp",verifyToken,upload.single("image"), uploadProfilepic )
+    router.post("/uploadProfilePic",verifyToken,upload.single("image"), uploadProfilepic )
     export default router;
 

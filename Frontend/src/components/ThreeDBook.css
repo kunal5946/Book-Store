@@ -1,0 +1,134 @@
+.book-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+    /* Better depth */
+    width: 400px;
+    /* Ample space */
+    height: 500px;
+}
+
+@keyframes rotate-book {
+    0% {
+        transform: rotateY(0deg) rotateX(10deg);
+    }
+
+    /* Slight tilt */
+    50% {
+        transform: rotateY(180deg) rotateX(0deg);
+    }
+
+    100% {
+        transform: rotateY(360deg) rotateX(10deg);
+    }
+}
+
+.book {
+    width: 220px;
+    height: 340px;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateY(-30deg);
+    animation: float-book 6s ease-in-out infinite, rotate-book 20s linear infinite;
+}
+
+.book:hover {
+    animation-play-state: paused;
+}
+
+@keyframes float-book {
+
+    0%,
+    100% {
+        transform: translateY(0) rotateY(-30deg);
+    }
+
+    50% {
+        transform: translateY(-20px) rotateY(-30deg);
+    }
+}
+
+/* Faces */
+.book>div {
+    position: absolute;
+    /* Backface visibility is important for solid feel, but let's keep it visible for now */
+    backface-visibility: visible;
+}
+
+/* Front Cover */
+.front {
+    width: 220px;
+    height: 340px;
+    transform: translateZ(25px);
+    /* Half depth */
+    background-color: #1a1a1a;
+    /* ZOOM IN TO CROP WHITE BORDERS */
+    background-size: 150%;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    box-shadow: inset 4px 0 10px rgba(0, 0, 0, 0.5);
+    /* Spine shadow */
+    border-radius: 2px 5px 5px 2px;
+}
+
+/* Back Cover */
+.back {
+    width: 220px;
+    height: 340px;
+    transform: rotateY(180deg) translateZ(25px);
+    /* Same distance out */
+    background-color: #8B0000;
+    /* Dark Red to match the book */
+    border-radius: 2px 5px 5px 2px;
+    box-shadow: inset 4px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Spine (Left) */
+.left {
+    width: 50px;
+    height: 340px;
+    left: -25px;
+    /* Center at 0 */
+    transform: rotateY(-90deg);
+    background-color: #500;
+    /* Darker Red spine */
+    border-radius: 2px;
+}
+
+/* Pages (Right) */
+.right {
+    width: 50px;
+    height: 340px;
+    right: -25px;
+    /* Center at width (220) */
+    transform: rotateY(90deg);
+    background: #fff;
+    /* Page texture */
+    background: linear-gradient(to right, #e3e3e3 0%, #ffffff 50%, #e3e3e3 100%);
+}
+
+/* Top */
+.top {
+    width: 220px;
+    height: 50px;
+    top: -25px;
+    transform: rotateX(90deg);
+    background: #fff;
+    /* Page lines */
+    background: repeating-linear-gradient(90deg, #fff, #fff 1px, #f0f0f0 2px, #f0f0f0 3px);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Bottom */
+.bottom {
+    width: 220px;
+    height: 50px;
+    bottom: -25px;
+    transform: rotateX(-90deg);
+    background: #fff;
+    /* Page lines */
+    background: repeating-linear-gradient(90deg, #fff, #fff 1px, #f0f0f0 2px, #f0f0f0 3px);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
