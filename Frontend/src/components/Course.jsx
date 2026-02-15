@@ -69,28 +69,13 @@ const Course = () => {
                 </div>
                 <br />
                 <br />
-                <div >
-                    <div className="hover-3d ">
-                        {/* content */}
-                        <figure className="max-w-100 rounded-2xl">
-                            <button
-                                onClick={() => navigate("/Upload")}
-                                className="shadow-xl bg-blue-500 text-white  px-4 py-5 rounded transition transform:transition hover:scale-5px "
-                            >
-                                Contribute a  Book
-                            </button>
-
-                        </figure>
-                        {/* 8 empty divs needed for the 3D effect */}
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                    </div>
+                <div className="mt-8 mb-8 text-center">
+                    <button
+                        onClick={() => navigate("/Upload")}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-lg transition-transform transform hover:scale-105"
+                    >
+                        Contribute a Book
+                    </button>
                 </div>
                 <br />
 

@@ -4,6 +4,10 @@
   border-radius: inherit;
   overflow: visible;
   isolation: isolate;
+  width: fit-content;
+  /* 🔥 FIX: Ensure border wraps content tightly */
+  display: inline-block;
+  /* 🔥 FIX: Prevent full width expansion */
 }
 
 .eb-canvas-container {

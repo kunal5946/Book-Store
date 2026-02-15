@@ -65,17 +65,17 @@ const Recommend = () => {
           </h1>
 
           {/* INPUT */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe what you want to read..."
-              className="flex-1 p-3 rounded bg-black/40 border border-white/20"
+              className="w-full sm:flex-1 p-3 rounded bg-black/40 border border-white/20"
             />
 
             <button
               onClick={handleRecommend}
-              className="bg-purple-600 px-6 py-3 rounded hover:bg-purple-700"
+              className="w-full sm:w-auto bg-purple-600 px-6 py-3 rounded hover:bg-purple-700"
             >
               Find
             </button>
