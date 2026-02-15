@@ -74,6 +74,7 @@ const Navbar = ({ onSearch }) => {
         opacity={0.9}
         mixBlendMode="normal"
         className={`rounded-2xl ${sticky ? "border border-base-300 shadow-xl transition-all duration-300" : ""}`}
+        style={{ overflow: "visible" }} // 🔥 FIX: Allow dropdown to overflow the container
       >
         {/* 🔥 END OF CHANGE */}
 
