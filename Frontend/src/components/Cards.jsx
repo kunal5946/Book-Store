@@ -8,7 +8,7 @@ function Cards({ item }) {
       speed={1}
       chaos={0.12}
       thickness={2}
-       
+
     >
       <a
         href={`https://docs.google.com/gview?url=${item.pdf}&embedded=true`}
@@ -16,7 +16,7 @@ function Cards({ item }) {
         rel="noopener noreferrer"
         className="block"
       >
-        <div className="border-[2px] my-2 p-3 card bg-base-96 shadow-xl w-full hover:scale-[1.01] transition">
+        <div className="border-[2px] my-2 p-3 card bg-base-96 shadow-xl w-full">
           <figure>
             <img src={item.image || "/bookcard.jpg"} alt={item.name} />
           </figure>

@@ -30,7 +30,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/Upload" element={<Upload />} />
         <Route path="/profile" element={authUser ? <Profile /> : <Navigate to="/signup" />}></Route>
-        <Route path="/recommend" element={<Recommend />}></Route>
+        <Route path="/recommend" element={authUser ? <Recommend /> : <Navigate to="/signup" />}></Route>
         
       </Routes>
 
