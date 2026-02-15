@@ -16,7 +16,7 @@ function Cards({ item }) {
         rel="noopener noreferrer"
         className="block"
       >
-        <div className="border-[2px] my-2 p-3 card bg-base-96 shadow-xl w-full">
+        <div className="border-[2px] p-3 card bg-base-96 shadow-xl w-full">
           <figure>
             <img src={item.image || "/bookcard.jpg"} alt={item.name} />
           </figure>
