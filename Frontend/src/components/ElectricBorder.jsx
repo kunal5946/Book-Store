@@ -248,13 +248,18 @@ const ElectricBorder = ({
       animationRef.current = requestAnimationFrame(drawElectricBorder);
     };
 
-    // Handle resize
+    // Handle resize of container AND content
     const resizeObserver = new ResizeObserver(() => {
       const newSize = updateSize();
       width = newSize.width;
       height = newSize.height;
     });
-    resizeObserver.observe(container);
+
+    if (container) resizeObserver.observe(container);
+
+    // 🔥 NEW: Also observe the content wrapper to catch dynamic size changes
+    const contentElement = container.querySelector('.eb-content');
+    if (contentElement) resizeObserver.observe(contentElement);
 
     // Start animation
     animationRef.current = requestAnimationFrame(drawElectricBorder);
