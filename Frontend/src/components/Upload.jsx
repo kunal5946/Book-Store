@@ -27,7 +27,7 @@ const Upload = () => {
       const token = localStorage.getItem("token");
 
 
-      await axios.post("http://localhost:4000/book/upload", formdata, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/book/upload`, formdata, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

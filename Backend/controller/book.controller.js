@@ -139,39 +139,60 @@ export const recommendBooks = async (req, res) => {
       return res.status(400).json({ message: "Prompt required" });
     }
 
-    // 🔵 Use your existing AI function
-    const aiResult = await generateTagsAndGenres(prompt);
+    let genres = [];
+    let tags = [];
+    let isFallback = false;
 
-    const genres = (aiResult.genres || []).map(g => g.toLowerCase());
-    const tags = (aiResult.tags || []).map(t => t.toLowerCase());
+    // 🟣 TRY AI FIRST
+    try {
+      const aiResult = await generateTagsAndGenres(prompt);
 
-    console.log("User wants:", genres, tags);
+      genres = (aiResult.genres || []).map(g => g.toLowerCase());
+      tags = (aiResult.tags || []).map(t => t.toLowerCase());
 
-    // 🔵 Get all books from DB
+      console.log("AI result:", genres, tags);
+
+      // FIX: If AI returned nothing, trigger fallback
+      if (genres.length === 0 && tags.length === 0) {
+        throw new Error("AI returned empty results");
+      }
+
+    } catch (aiErr) {
+      console.log("⚠️ AI quota hit → using fallback");
+      isFallback = true;
+
+      // 🔥 FALLBACK: use prompt words as tags
+      const words = prompt.toLowerCase().split(" ");
+
+      genres = words;
+      tags = words;
+    }
+
+    // 🟣 GET BOOKS
     const allBooks = await Book.find();
 
-    // 🔥 SMART SCORING
+    // 🟣 SCORING
     const scored = allBooks.map(book => {
       let score = 0;
 
       const bookGenres = (book.genre || []).map(g => g.toLowerCase());
       const bookTags = (book.tags || []).map(t => t.toLowerCase());
 
-      // 🟣 TAG MATCH = strongest (money, investing etc)
+      // tag match
       tags.forEach(t => {
         if (bookTags.some(bt => bt.includes(t))) {
           score += 5;
         }
       });
 
-      // 🟣 GENRE MATCH = medium
+      // genre match
       genres.forEach(g => {
         if (bookGenres.some(bg => bg.includes(g))) {
           score += 3;
         }
       });
 
-      // 🟣 Title keyword match (very strong)
+      // title match
       if (book.name.toLowerCase().includes(prompt.toLowerCase())) {
         score += 8;
       }
@@ -179,19 +200,35 @@ export const recommendBooks = async (req, res) => {
       return { book, score };
     });
 
-    // 🔵 Sort highest score first
     scored.sort((a, b) => b.score - a.score);
 
-    // 🔵 Remove books with zero score
     const result = scored
       .filter(item => item.score > 0)
       .map(item => item.book);
 
-    res.json(result);
+    // 🔥 ALWAYS RETURN SOMETHING
+    if (result.length === 0) {
+      // If AI failed AND keyword search failed, return random books + message
+      if (isFallback) {
+        return res.json({
+          books: allBooks.slice(0, 6),
+          fallback: true
+        });
+      }
+      return res.json({ books: [], fallback: false });
+    }
+
+    res.json({ books: result, fallback: isFallback });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Recommendation failed" });
+    console.log("Recommendation error:", err);
+
+    // 🔥 HARD FALLBACK (never freeze UI)
+    const allBooks = await Book.find();
+    // Return explicit message flag for frontend to handle
+    res.json({
+      books: allBooks.slice(0, 6),
+      fallback: true
+    });
   }
 };
-

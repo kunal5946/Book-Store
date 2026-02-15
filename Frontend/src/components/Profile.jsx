@@ -24,7 +24,7 @@ const Profile = () => {
           setUser(storedUser);
 
           const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-          const res = await axios.get("http://localhost:4000/book", config);
+          const res = await axios.get(`${import.meta.env.VITE_API_URL}/book`, config);
           // Filtering logic: Assuming book has uploadedBy field matching user ID
           const bookData = res.data.filter((book) => book.uploadedBy === storedUser._id);
           console.log("Fetched books:", res.data);
@@ -62,7 +62,7 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem("token")
-      const res = await axios.post("http://localhost:4000/users/uploadProfilePic", formdata,
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/users/uploadProfilePic`, formdata,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -91,7 +91,7 @@ const Profile = () => {
     const loadingBook = toast.loading("Deleting book");
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:4000/book/${bookId}`,
+      await axios.delete(`${import.meta.env.VITE_API_URL}/book/${bookId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

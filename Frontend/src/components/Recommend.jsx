@@ -17,11 +17,22 @@ const Recommend = () => {
     setBooks([]);
 
     try {
-      const res = await axios.post("http://localhost:4000/book/recommend", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/book/recommend`, {
         prompt
       });
 
-      setBooks(res.data || []);
+      const data = res.data;
+
+      // Handle both array (legacy) and object (new) formats for robustness
+      const bookList = Array.isArray(data) ? data : (data.books || []);
+
+      setBooks(bookList);
+
+      if (data.fallback) {
+        // Specific message requested by user
+        alert("Sorry AI quota for today has been completed, please try again later. For now, please browse books in the course page.");
+      }
+
     } catch (err) {
       console.log(err);
       alert("Error fetching recommendations");

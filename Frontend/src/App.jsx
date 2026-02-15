@@ -9,7 +9,7 @@ import { Toaster } from "react-hot-toast"
 import { useAuth } from './context/AuthProvider'
 import Upload from './components/Upload'
 import Profile from './components/Profile'
-import Contact from './components/Contact'
+
 import Recommend from './components/Recommend'
 function App() {
 

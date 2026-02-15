@@ -1,5 +1,5 @@
 import React from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import Login from "./Login";
 import axios from "axios";
@@ -10,36 +10,36 @@ import { useAuth } from "../context/AuthProvider";
 const SignUp = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
-  const { setAuthUser}=useAuth()
+  const { setAuthUser } = useAuth()
 
 
-  const onSubmit = async(data) =>{
-    const userInformation={
+  const onSubmit = async (data) => {
+    const userInformation = {
       fullname: data.fullname,
-      email:data.email,
-      password:data.password
+      email: data.email,
+      password: data.password
     }
-     await axios.post("http://localhost:4000/users/signup",userInformation).then(
-      (res)=>{
+    await axios.post(`${import.meta.env.VITE_API_URL}/users/signup`, userInformation).then(
+      (res) => {
         console.log(res.data)
-        if(res.data){
+        if (res.data) {
           toast.success('signup successfull !')
         }
-        localStorage.setItem( "Users",JSON.stringify(res.data.user))
+        localStorage.setItem("Users", JSON.stringify(res.data.user))
         setAuthUser(res.data.user)
-        localStorage.setItem("token",res.data.token)
+        localStorage.setItem("token", res.data.token)
         navigate("/")
-        
+
       }
-    ).catch((err)=>{
-      if(err.response){
-      console.log(err)
-      
-      toast.error(err.response.data.message)
+    ).catch((err) => {
+      if (err.response) {
+        console.log(err)
+
+        toast.error(err.response.data.message)
       }
     })
 
-  } ;
+  };
 
   // Function to open the Login modal
   const openLoginModal = () => {
