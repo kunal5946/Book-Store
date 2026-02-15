@@ -26,13 +26,13 @@ export const getFreebooks = async (req, res) => {
 
 export const uploadBook = async (req, res) => {
   try {
-    const { name, title } = req.body;
+    const { name, title, manualGenre, manualTags } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // upload PDF to cloudinary
+    // 🔵 Upload PDF to Cloudinary
     const uploaded = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { resource_type: "raw", folder: "books", chunk_size: 6_000_000 },
@@ -44,27 +44,41 @@ export const uploadBook = async (req, res) => {
       stream.end(req.file.buffer);
     });
 
-    // Check for manual inputs first
     let genres = [];
     let tags = [];
 
-    const { manualGenre, manualTags } = req.body;
-
+    // 🟢 If user manually provided tags/genre
     if (manualGenre || manualTags) {
-      if (manualGenre) genres.push(manualGenre);
-      if (manualTags) tags = manualTags.split(',').map(t => t.trim());
+      if (manualGenre) {
+        genres.push(manualGenre.toLowerCase());
+      }
+
+      if (manualTags) {
+        tags = manualTags
+          .split(",")
+          .map(t => t.trim().toLowerCase())
+          .filter(Boolean);
+      }
+
     } else {
-      // Only try AI if no manual data provided
+      // 🟣 Otherwise use AI
       try {
         const aiResult = await generateTagsAndGenres(name);
-        genres = aiResult.genres;
-        tags = aiResult.tags;
+
+        genres = Array.isArray(aiResult.genres)
+          ? aiResult.genres.map(g => g.toLowerCase())
+          : [];
+
+        tags = Array.isArray(aiResult.tags)
+          ? aiResult.tags.map(t => t.toLowerCase())
+          : [];
+
       } catch (aiError) {
         console.log("AI Generation failed:", aiError);
       }
     }
 
-    // save book
+    // 🔵 Save book to Mongo
     const newBook = new Book({
       name,
       title,
@@ -73,7 +87,6 @@ export const uploadBook = async (req, res) => {
       pdf: uploaded.secure_url,
       uploadedBy: req.user.id,
       pdfPublicId: uploaded.public_id,
-
       genre: genres,
       tags: tags
     });
@@ -90,6 +103,8 @@ export const uploadBook = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
 
 
 export const deleteBook = async (req, res) => {
@@ -115,3 +130,68 @@ export const deleteBook = async (req, res) => {
     return res.status(400).json({ message: "deletion failed" });
   }
 }
+
+export const recommendBooks = async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ message: "Prompt required" });
+    }
+
+    // 🔵 Use your existing AI function
+    const aiResult = await generateTagsAndGenres(prompt);
+
+    const genres = (aiResult.genres || []).map(g => g.toLowerCase());
+    const tags = (aiResult.tags || []).map(t => t.toLowerCase());
+
+    console.log("User wants:", genres, tags);
+
+    // 🔵 Get all books from DB
+    const allBooks = await Book.find();
+
+    // 🔥 SMART SCORING
+    const scored = allBooks.map(book => {
+      let score = 0;
+
+      const bookGenres = (book.genre || []).map(g => g.toLowerCase());
+      const bookTags = (book.tags || []).map(t => t.toLowerCase());
+
+      // 🟣 TAG MATCH = strongest (money, investing etc)
+      tags.forEach(t => {
+        if (bookTags.some(bt => bt.includes(t))) {
+          score += 5;
+        }
+      });
+
+      // 🟣 GENRE MATCH = medium
+      genres.forEach(g => {
+        if (bookGenres.some(bg => bg.includes(g))) {
+          score += 3;
+        }
+      });
+
+      // 🟣 Title keyword match (very strong)
+      if (book.name.toLowerCase().includes(prompt.toLowerCase())) {
+        score += 8;
+      }
+
+      return { book, score };
+    });
+
+    // 🔵 Sort highest score first
+    scored.sort((a, b) => b.score - a.score);
+
+    // 🔵 Remove books with zero score
+    const result = scored
+      .filter(item => item.score > 0)
+      .map(item => item.book);
+
+    res.json(result);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Recommendation failed" });
+  }
+};
+

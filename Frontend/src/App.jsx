@@ -10,6 +10,7 @@ import { useAuth } from './context/AuthProvider'
 import Upload from './components/Upload'
 import Profile from './components/Profile'
 import Contact from './components/Contact'
+import Recommend from './components/Recommend'
 function App() {
 
   const { authUser, setAuthUser } = useAuth()
@@ -29,7 +30,8 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/Upload" element={<Upload />} />
         <Route path="/profile" element={authUser ? <Profile /> : <Navigate to="/signup" />}></Route>
-        <Route path="/contact" element={<Contact />}></Route>
+        <Route path="/recommend" element={<Recommend />}></Route>
+        
       </Routes>
 
 

@@ -1,44 +1,38 @@
-import axios from "axios";
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY
+});
 
 export const generateTagsAndGenres = async (bookName) => {
   try {
-    const res = await axios.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        model: "mistralai/mistral-7b-instruct:free",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Return ONLY JSON in format {genres:[], tags:[]}. No text."
-          },
-          {
-            role: "user",
-            content: `Book: ${bookName}`
-          }
-        ]
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json"
-        }
-      }
-    );
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Return ONLY JSON.
 
-    const text = res.data.choices[0].message.content;
+Book: ${bookName}
 
-    console.log("AI raw:", text);
+Format:
+{
+ "genres": ["..."],
+ "tags": ["..."]
+}`
+    });
+
+    const text = response.text;
+
+    console.log("Gemini raw:", text);
 
     const cleaned = text.replace(/```json|```/g, "").trim();
-    const data = JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
 
     return {
-      genres: data.genres || [],
-      tags: data.tags || []
+      genres: parsed.genres || [],
+      tags: parsed.tags || []
     };
+
   } catch (err) {
-    console.log("AI error:", err.message);
+    console.log("Gemini error:", err);
     return { genres: [], tags: [] };
   }
 };
