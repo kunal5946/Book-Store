@@ -2,6 +2,7 @@ import React from 'react'
 import Footer from './Footer'
 import List from '../../public/list.json'
 import Cards from './Cards'
+import CardSkeleton from './CardSkeleton'
 import { Link, useNavigate } from 'react-router-dom'
 import Navbar from './Navbar'
 import axios from "axios"
@@ -13,6 +14,7 @@ const Course = () => {
     const navigate = useNavigate()
 
     const [book, setBook] = useState([])
+    const [loading, setLoading] = useState(true)
 
     const [searchTerm, setSearchTerm] = useState("")
 
@@ -27,8 +29,10 @@ const Course = () => {
                 })
                 console.log(res.data)
                 setBook(res.data)
+                setLoading(false)
             } catch (error) {
                 console.log(error)
+                setLoading(false)
                 if (error.response && error.response.status == 401) {
                     toast.error("Session expired. Please login again")
                     localStorage.removeItem("Users")
@@ -81,19 +85,24 @@ const Course = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 ">
 
-                    {
+                    {loading ? (
+                        Array.from({ length: 8 }).map((_, index) => (
+                            <div key={index}>
+                                <CardSkeleton />
+                            </div>
+                        ))
+                    ) : (
                         searchedBooks.map(
                             (item) => {
                                 const paidItem = { ...item, category: 'paid' };
                                 return (
-                                    <div className="transform transition-transform hover:scale-105 duration-300" key={paidItem.id}>
+                                    <div className="transform transition-transform hover:scale-105 duration-300" key={paidItem.id || item._id}>
                                         <Cards item={paidItem} />
                                     </div>
                                 );
                             }
                         )
-
-                    }
+                    )}
 
                 </div>
 

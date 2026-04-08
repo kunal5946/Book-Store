@@ -4,11 +4,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import Cards from './Cards'
+import CardSkeleton from './CardSkeleton'
 import axios from 'axios';
 import { useState, useEffect } from 'react'
 
 const Freebook = () => {
   const [book, setBook] = useState([])
+  const [loading, setLoading] = useState(true)
   useEffect(() => {
     const getBook = async () => {
       try {
@@ -18,8 +20,10 @@ const Freebook = () => {
 
         setBook(res.data.filter(
           (data) => data.category === "free"))
+        setLoading(false)
       } catch (error) {
         console.log(error)
+        setLoading(false)
       }
     }
     getBook();
@@ -73,11 +77,19 @@ const Freebook = () => {
         <div className="slider-container">
 
           <Slider {...settings}>
-            {book.map((item) => (
-              <div className="transform transition-transform  hover:scale-105 duration-300 px-3" key={item.id} >
-                <Cards item={item} />
-              </div>
-            ))}
+            {loading ? (
+              Array.from({ length: 3 }).map((_, index) => (
+                <div className="px-3" key={index}>
+                  <CardSkeleton />
+                </div>
+              ))
+            ) : (
+              book.map((item) => (
+                <div className="transform transition-transform  hover:scale-105 duration-300 px-3" key={item.id} >
+                  <Cards item={item} />
+                </div>
+              ))
+            )}
           </Slider>
 
         </div>
