@@ -143,7 +143,7 @@ export const recommendBooks = async (req, res) => {
     let tags = [];
     let isFallback = false;
 
-    // 🟣 TRY AI FIRST
+    //  TRY AI FIRST
     try {
       const aiResult = await generateTagsAndGenres(prompt);
 
@@ -158,20 +158,20 @@ export const recommendBooks = async (req, res) => {
       }
 
     } catch (aiErr) {
-      console.log("⚠️ AI quota hit → using fallback");
+      console.log("AI quota hit → using fallback");
       isFallback = true;
 
-      // 🔥 FALLBACK: use prompt words as tags
+      // FALLBACK: use prompt words as tags
       const words = prompt.toLowerCase().split(" ");
 
       genres = words;
       tags = words;
     }
 
-    // 🟣 GET BOOKS
+    //  GET BOOKS
     const allBooks = await Book.find();
 
-    // 🟣 SCORING
+    //  SCORING
     const scored = allBooks.map(book => {
       let score = 0;
 
@@ -206,7 +206,7 @@ export const recommendBooks = async (req, res) => {
       .filter(item => item.score > 0)
       .map(item => item.book);
 
-    // 🔥 ALWAYS RETURN SOMETHING
+    //  ALWAYS RETURN SOMETHING
     if (result.length === 0) {
       // If AI failed AND keyword search failed, return random books + message
       if (isFallback) {
@@ -223,7 +223,7 @@ export const recommendBooks = async (req, res) => {
   } catch (err) {
     console.log("Recommendation error:", err);
 
-    // 🔥 HARD FALLBACK (never freeze UI)
+    //  HARD FALLBACK (never freeze UI)
     const allBooks = await Book.find();
     // Return explicit message flag for frontend to handle
     res.json({

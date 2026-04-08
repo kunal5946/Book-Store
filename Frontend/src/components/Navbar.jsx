@@ -60,7 +60,7 @@ const Navbar = ({ onSearch }) => {
   return (
 
     <div className="max-w-screen-2xl container mx-auto md:px-20 px-4 fixed top-0 left-0 z-50 right-0">
-      {/* 🔥 CHANGED: Replaced Tailwind blur background with GlassSurface */}
+      {/*  CHANGED: Replaced Tailwind blur background with GlassSurface */}
       <GlassSurface
         width="100%"
         height={80}
@@ -74,9 +74,9 @@ const Navbar = ({ onSearch }) => {
         opacity={0.9}
         mixBlendMode="normal"
         className={`rounded-2xl ${sticky ? "border border-base-300 shadow-xl transition-all duration-300" : ""}`}
-        style={{ overflow: "visible" }} // 🔥 FIX: Allow dropdown to overflow the container
+        style={{ overflow: "visible" }} //  FIX: Allow dropdown to overflow the container
       >
-        {/* 🔥 END OF CHANGE */}
+        {/*  END OF CHANGE */}
 
         <div className="navbar shadow-sm">
 
