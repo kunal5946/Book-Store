@@ -27,7 +27,7 @@ const Login = () => {
                 console.log(res.data)
                 if (res.data) {
                     localStorage.setItem("Users", JSON.stringify(res.data.user))
-                    localStorage.setItem("token", res.data.token)
+                    
                     toast.success('Login successful!')
                     setAuthUser(res.data.user);
                     document.getElementById("login_modal").close()

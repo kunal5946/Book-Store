@@ -24,14 +24,12 @@ const Upload = () => {
       formdata.append("title", title);
       formdata.append("name", name);
       formdata.append("pdf", file);
-      const token = localStorage.getItem("token");
+    
 
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/book/upload`, formdata, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post(`${import.meta.env.VITE_API_URL}/book/upload`, formdata
+       
+      );
       toast.dismiss(loadingToast);
       toast.success("uploaded");
     } catch (error) {

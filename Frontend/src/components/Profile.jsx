@@ -19,12 +19,12 @@ const Profile = () => {
     const fetchBooks = async () => {
       try {
         const storedUser = JSON.parse(localStorage.getItem("Users"));
-        const token = localStorage.getItem("token");
+        
         if (storedUser) {
           setUser(storedUser);
 
-          const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-          const res = await axios.get(`${import.meta.env.VITE_API_URL}/book`, config);
+         
+          const res = await axios.get(`${import.meta.env.VITE_API_URL}/book`);
           // Filtering logic: Assuming book has uploadedBy field matching user ID
           const bookData = res.data.filter((book) => book.uploadedBy === storedUser._id);
           console.log("Fetched books:", res.data);
@@ -61,11 +61,11 @@ const Profile = () => {
     const loadingToast = toast.loading("Uploading profile picture...");
 
     try {
-      const token = localStorage.getItem("token")
+      
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/users/uploadProfilePic`, formdata,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            
             "Content-Type": "multipart/form-data"
           }
         }
@@ -90,14 +90,9 @@ const Profile = () => {
     if (!confirmDelete) return;
     const loadingBook = toast.loading("Deleting book");
     try {
-      const token = localStorage.getItem("token");
+     
       await axios.delete(`${import.meta.env.VITE_API_URL}/book/${bookId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-
-          }
-        },
+        
       )
       toast.dismiss(loadingBook);
       toast.success("Book successfully deleted")

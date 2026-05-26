@@ -27,7 +27,7 @@ const SignUp = () => {
         }
         localStorage.setItem("Users", JSON.stringify(res.data.user))
         setAuthUser(res.data.user)
-        localStorage.setItem("token", res.data.token)
+        
         navigate("/")
 
       }

@@ -2,14 +2,23 @@ import React from 'react'
 import { useAuth } from '../context/AuthProvider'
 import { useNavigate } from 'react-router-dom'
 import toast from "react-hot-toast";
+import axios from "axios";
+
 
 function Logout() {
   const {authUser,setAuthUser}=useAuth()
   const navigate=useNavigate()
-  const handleLogout=()=>{
+  const handleLogout=async ()=>{
     
       try{
-        toast.success("Logout successful")   
+        
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/users/logout`,
+          {},
+          {withCredentials:true}
+        );
+
+        toast.success("Logout successful")
 
         setTimeout(() => {
           setAuthUser(null)                 
@@ -18,7 +27,8 @@ function Logout() {
         }, 500)    
       }
       catch(error){
-        toast.error(error.message)
+        const errorMsg = error.response?.data?.message || error.message;
+        toast.error(errorMsg)
         
       }
     

@@ -172,63 +172,63 @@ export const recommendBooks = async (req, res) => {
     const allBooks = await Book.find();
 
     //  SCORING
-    const scored = allBooks.map(book => {
-      let score = 0;
+      const scored = allBooks.map(book => {
+        let score = 0;
 
-      const bookGenres = (book.genre || []).map(g => g.toLowerCase());
-      const bookTags = (book.tags || []).map(t => t.toLowerCase());
+        const bookGenres = (book.genre || []).map(g => g.toLowerCase());
+        const bookTags = (book.tags || []).map(t => t.toLowerCase());
 
-      // tag match
-      tags.forEach(t => {
-        if (bookTags.some(bt => bt.includes(t))) {
-          score += 5;
-        }
-      });
-
-      // genre match
-      genres.forEach(g => {
-        if (bookGenres.some(bg => bg.includes(g))) {
-          score += 3;
-        }
-      });
-
-      // title match
-      if (book.name.toLowerCase().includes(prompt.toLowerCase())) {
-        score += 8;
-      }
-
-      return { book, score };
-    });
-
-    scored.sort((a, b) => b.score - a.score);
-
-    const result = scored
-      .filter(item => item.score > 0)
-      .map(item => item.book);
-
-    //  ALWAYS RETURN SOMETHING
-    if (result.length === 0) {
-      // If AI failed AND keyword search failed, return random books + message
-      if (isFallback) {
-        return res.json({
-          books: allBooks.slice(0, 6),
-          fallback: true
+        // tag match
+        tags.forEach(t => {
+          if (bookTags.some(bt => bt.includes(t))) {
+            score += 5;
+          }
         });
+
+        // genre match
+        genres.forEach(g => {
+          if (bookGenres.some(bg => bg.includes(g))) {
+            score += 3;
+          }
+        });
+
+        // title match
+        if (book.name.toLowerCase().includes(prompt.toLowerCase())) {
+          score += 8;
+        }
+
+        return { book, score };
+      });
+
+      scored.sort((a, b) => b.score - a.score);
+
+      const result = scored
+        .filter(item => item.score > 0)
+        .map(item => item.book);
+
+      //  ALWAYS RETURN SOMETHING
+      if (result.length === 0) {
+        // If AI failed AND keyword search failed, return random books + message
+        if (isFallback) {
+          return res.json({
+            books: allBooks.slice(0, 6),
+            fallback: true
+          });
+        }
+        return res.json({ books: [], fallback: false });
       }
-      return res.json({ books: [], fallback: false });
+
+      res.json({ books: result, fallback: isFallback });
+
+    } catch (err) {
+      console.log("Recommendation error:", err);
+
+      //  HARD FALLBACK (never freeze UI)
+      const allBooks = await Book.find();
+      // Return explicit message flag for frontend to handle
+      res.json({
+        books: allBooks.slice(0, 6),
+        fallback: true
+      });
     }
-
-    res.json({ books: result, fallback: isFallback });
-
-  } catch (err) {
-    console.log("Recommendation error:", err);
-
-    //  HARD FALLBACK (never freeze UI)
-    const allBooks = await Book.find();
-    // Return explicit message flag for frontend to handle
-    res.json({
-      books: allBooks.slice(0, 6),
-      fallback: true
-    });
-  }
 };

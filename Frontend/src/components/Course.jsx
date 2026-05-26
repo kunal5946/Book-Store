@@ -19,14 +19,12 @@ const Course = () => {
     const [searchTerm, setSearchTerm] = useState("")
 
     useEffect(() => {
-        const token = localStorage.getItem("token")
+        
         const getBook = async () => {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL}/book`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/book`
+                   
+                )
                 console.log(res.data)
                 setBook(res.data)
                 setLoading(false)
@@ -36,7 +34,7 @@ const Course = () => {
                 if (error.response && error.response.status == 401) {
                     toast.error("Session expired. Please login again")
                     localStorage.removeItem("Users")
-                    localStorage.removeItem("token")
+                   
                     navigate("/signup")
                 }
             }

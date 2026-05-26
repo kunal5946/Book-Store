@@ -29,6 +29,12 @@ export const signup = async (req, res) => {
             { expiresIn: "7d" }
 
         )
+        res.cookie("token",token,{
+            httpOnly:true,
+            secure:process.env.NODE_ENV==="production",
+            sameSite:"strict",
+            maxAge:7*24*60*60*1000
+        })
 
         res.status(201).json({
             message: "User successfully created",
@@ -37,8 +43,8 @@ export const signup = async (req, res) => {
                 fullname: createdUser.fullname,
                 email: createdUser.email,
                 profilepic: createdUser.profilepic
-            },
-            token
+            }
+            
         })
 
     } catch (error) {
@@ -70,6 +76,14 @@ export const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         )
+
+        res.cookie("token",token,{
+            httpOnly:true,
+            secure:process.env.NODE_ENV==="production",
+            sameSite:"strict",
+            maxAge:7 * 24 * 60 * 60 * 1000
+        })
+
         res.status(200).json({
             message: "login successful",
             user: {
@@ -77,8 +91,8 @@ export const login = async (req, res) => {
                 fullname: user.fullname,
                 email: user.email,
                 profilepic: user.profilepic
-            },
-            token
+            }
+            
 
         })
 
@@ -128,3 +142,20 @@ export const uploadProfilepic = async (req, res) => {
         res.status(500).json({ msg: "Upload failed" });
     }
 }
+
+export const logout = async(req,res)=>{
+    try{
+        res.clearCookie("token",{
+             httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        });
+
+        res.status(200).json({message:"logged out successfully"});
+
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message:"internal server error"});
+    }
+};
