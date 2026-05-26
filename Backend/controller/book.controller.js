@@ -1,26 +1,61 @@
 import Book from "../model/book.model.js"
 import cloudinary from "../config/cloudinary.js"
+import redisClient from "../config/redis.js";
 import { generateTagsAndGenres } from "../utils/aiTags.js";
 
 export const getBook = async (req, res) => {
   console.log("GET /book was called");
-  try {
-    const book = await Book.find()
-    res.status(200).json(book)
-  }
-  catch (error) {
-    console.log("Error:", error)
-    res.status(500).json(error)
+
+  try{
+    let cachedBooks=null;
+
+    try{
+      cachedBooks=await redisClient.get("books:all");
+
+    }catch(redisError){
+      console.log(redisError)
+    }
+    if(cachedBooks){
+      return res.status(200).json(JSON.parse(cachedBooks));
+    }
+    const book=await Book.find();
+
+    try{
+      await redisClient.setEx("books:all",3600,JSON.stringify(book));
+    }catch(redisError){
+      console.error(redisError);
+    }
+    res.status(200).json(book);
+
+  }catch(error){
+      console.log("Error:", error);
+    res.status(500).json(error);
   }
 }
 
 export const getFreebooks = async (req, res) => {
-  try {
-    const book = await Book.find()
-    res.status(200).json(book)
-  }
-  catch (error) {
-    res.status(500).json(error)
+ try{
+    let cachedFree=null;
+    try{
+      cachedFree=await redisClient.get("books:free");
+
+    }catch(redisError){
+       console.error(redisError);
+    }
+    if(cachedFree){
+      return res.status(200).json(JSON.parse(cachedFree));
+
+    }
+    const book=await Book.find();
+    try{
+      await redisClient.setEx("books:free",3600,JSON.stringify(book));
+
+    }catch(rediserror){
+      console.error(rediserror);
+    }
+    res.status(200).json(book);
+  }catch(error){
+    res.status(500).json(error);
   }
 }
 
@@ -32,7 +67,7 @@ export const uploadBook = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // 🔵 Upload PDF to Cloudinary
+    // upload PDF to Cloudinary
     const uploaded = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         { resource_type: "raw", folder: "books", chunk_size: 6_000_000 },
@@ -47,7 +82,7 @@ export const uploadBook = async (req, res) => {
     let genres = [];
     let tags = [];
 
-    // 🟢 If user manually provided tags/genre
+    //  If user manually provided tags/genre
     if (manualGenre || manualTags) {
       if (manualGenre) {
         genres.push(manualGenre.toLowerCase());
@@ -61,7 +96,7 @@ export const uploadBook = async (req, res) => {
       }
 
     } else {
-      // 🟣 Otherwise use AI
+      //  Otherwise use AI
       try {
         const aiResult = await generateTagsAndGenres(name);
 
@@ -78,7 +113,7 @@ export const uploadBook = async (req, res) => {
       }
     }
 
-    // 🔵 Save book to Mongo
+    // Save book to Mongo
     const newBook = new Book({
       name,
       title,
@@ -93,6 +128,11 @@ export const uploadBook = async (req, res) => {
 
     await newBook.save();
 
+    try{
+      await redisClient.del(["books:all","books:free"]);
+    }catch(rediserror){
+      console.error(rediserror);
+    }
     res.status(200).json({
       message: "Upload successful",
       book: newBook
@@ -122,6 +162,13 @@ export const deleteBook = async (req, res) => {
     }
     //now delete the mongodb book deets
     await Book.findByIdAndDelete(bookid);
+    try{
+      await redisClient.del(["books:all","books:free"]);
+
+    }catch(rediserror){
+      console.error(rediserror);
+    }
+    
     return res.status(200).json({ message: "successfully deleted the book", id: bookid });
 
 

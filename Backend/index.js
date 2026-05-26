@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import "./config/redis.js"
 import mongoose from "mongoose";
 import bookRoute from "./route/book.route.js";
 import cors from "cors";
