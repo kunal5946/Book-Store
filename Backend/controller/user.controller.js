@@ -29,11 +29,11 @@ export const signup = async (req, res) => {
             { expiresIn: "7d" }
 
         )
-        res.cookie("token",token,{
-            httpOnly:true,
-            secure:process.env.NODE_ENV==="production",
-            sameSite:"strict",
-            maxAge:7*24*60*60*1000
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
         res.status(201).json({
@@ -77,11 +77,11 @@ export const login = async (req, res) => {
             { expiresIn: "7d" }
         )
 
-        res.cookie("token",token,{
-            httpOnly:true,
-            secure:process.env.NODE_ENV==="production",
-            sameSite:"strict",
-            maxAge:7 * 24 * 60 * 60 * 1000
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
         res.status(200).json({
@@ -145,10 +145,10 @@ export const uploadProfilepic = async (req, res) => {
 
 export const logout = async(req,res)=>{
     try{
-        res.clearCookie("token",{
-             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict"
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none"
         });
 
         res.status(200).json({message:"logged out successfully"});
