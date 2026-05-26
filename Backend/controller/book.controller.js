@@ -2,6 +2,7 @@ import Book from "../model/book.model.js"
 import cloudinary from "../config/cloudinary.js"
 import redisClient from "../config/redis.js";
 import { generateTagsAndGenres } from "../utils/aiTags.js";
+import { addUploadJob } from "../utils/uploadQueue.js";
 
 export const getBook = async (req, res) => {
   console.log("GET /book was called");
@@ -67,75 +68,16 @@ export const uploadBook = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // upload PDF to Cloudinary
-    const uploaded = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { resource_type: "raw", folder: "books", chunk_size: 6_000_000 },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-      stream.end(req.file.buffer);
-    });
-
-    let genres = [];
-    let tags = [];
-
-    //  If user manually provided tags/genre
-    if (manualGenre || manualTags) {
-      if (manualGenre) {
-        genres.push(manualGenre.toLowerCase());
-      }
-
-      if (manualTags) {
-        tags = manualTags
-          .split(",")
-          .map(t => t.trim().toLowerCase())
-          .filter(Boolean);
-      }
-
-    } else {
-      //  Otherwise use AI
-      try {
-        const aiResult = await generateTagsAndGenres(name);
-
-        genres = Array.isArray(aiResult.genres)
-          ? aiResult.genres.map(g => g.toLowerCase())
-          : [];
-
-        tags = Array.isArray(aiResult.tags)
-          ? aiResult.tags.map(t => t.toLowerCase())
-          : [];
-
-      } catch (aiError) {
-        console.log("AI Generation failed:", aiError);
-      }
-    }
-
-    // Save book to Mongo
-    const newBook = new Book({
+    await addUploadJob({
       name,
       title,
-      price: 0,
-      category: "paid",
-      pdf: uploaded.secure_url,
-      uploadedBy: req.user.id,
-      pdfPublicId: uploaded.public_id,
-      genre: genres,
-      tags: tags
-    });
+      manualGenre,
+      manualTags,
+      userId: req.user.id
+    }, req.file);
 
-    await newBook.save();
-
-    try{
-      await redisClient.del(["books:all","books:free"]);
-    }catch(rediserror){
-      console.error(rediserror);
-    }
-    res.status(200).json({
-      message: "Upload successful",
-      book: newBook
+    res.status(202).json({
+      message: "Book is being processed in the background"
     });
 
   } catch (error) {
@@ -168,7 +110,7 @@ export const deleteBook = async (req, res) => {
     }catch(rediserror){
       console.error(rediserror);
     }
-    
+
     return res.status(200).json({ message: "successfully deleted the book", id: bookid });
 
 
