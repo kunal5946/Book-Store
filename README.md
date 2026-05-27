@@ -1,46 +1,51 @@
-# OpenShelf - Modern Book Store Application
-here's the link - openshelf-frontend.onrender.com
+# OpenShelf: Modern Full-Stack Book Store Application
 
+OpenShelf is a full-stack MERN (MongoDB, Express, React, Node.js) application designed to provide a highly optimized, secure, and interactive experience for managing and browsing books. The application features secure cookie-based session management, AI-powered book recommendations, Redis caching, rate limiting, and an asynchronous task queue for handling heavy document uploads.
 
-OpenShelf is a full-stack MERN (MongoDB, Express, React, Node.js) application designed to provide a seamless and interactive experience for book lovers. It features a modern, responsive UI with 3D elements, AI-powered book recommendations, and secure user authentication.
+Live Application Link: `openshelf-frontend.onrender.com`
 
-## 🚀 Features
+---
 
--   **Modern UI/UX**: Built with React, TailwindCSS, and DaisyUI for a polished, responsive design.
--   **3D Visuals**: Integrated 3D book models and interactive elements using Three.js and React Three Fiber.
--   **AI Recommendations**: Personalized book suggestions powered by Google Generative AI / OpenAI.
--   **User Authentication**: Secure Login and Signup functionality using JWT and BCrypt.
--   **Book Management**: Browse, search, and manage a collection of books.
--   **Image Uploads**: Book cover uploads handled via Cloudinary and Multer.
--   **Responsive Design**: Fully optimized for desktop, tablet, and mobile devices.
+## Key Features
 
-## 🛠️ Tech Stack
+* **Secure Authentication**: User signups and logins use JSON Web Tokens (JWT) stored securely within HttpOnly cookies to protect against Cross-Site Scripting (XSS) and Cross-Site Request Forgery (CSRF) vulnerabilities.
+* **Asynchronous Task Queue (BullMQ)**: Large PDF document uploads are decoupled from the main HTTP request-response loop. The server immediately returns a `202 Accepted` status, delegating the Cloudinary storage upload and MongoDB persistence to a background worker.
+* **High-Performance Caching (Redis)**: Integrates an Upstash Redis cache using the Cache-Aside pattern. Popular book lists are cached for 1 hour, and AI recommendation responses are cached for 24 hours to reduce latency and eliminate database/API read costs.
+* **Cache Invalidation**: Automatic deletion of key caches (`books:all` and `books:free`) occurs when a new book is successfully uploaded or deleted, ensuring the client-side data remains fresh.
+* **API Rate Limiting**: Implements a sliding-window rate limiter backed by Redis. Requests are throttled at 100 requests per 15 minutes per IP to protect server resources and prevent abuse.
+* **AI Recommendation Engine**: Personalized book suggestions generated through prompt analysis, utilizing Google Generative AI (Gemini) or OpenAI, complete with database tag-matching fallback algorithms.
+* **3D Interactive Graphics**: Incorporates 3D interactive book models on the homepage banner using Three.js and React Three Fiber.
+
+---
+
+## Technical Architecture
 
 ### Frontend
--   **Framework**: React (Vite)
--   **Styling**: TailwindCSS, DaisyUI
--   **Animations**: Framer Motion, GSAP
--   **3D Graphics**: Three.js, OGL
--   **Routing**: React Router DOM (v7)
--   **State Management**: React Context / Hooks
--   **HTTP Client**: Axios
+* **Core Framework**: React (Vite)
+* **Styling**: TailwindCSS, DaisyUI
+* **Animations & 3D**: Framer Motion, GSAP, Three.js, React Three Fiber
+* **HTTP Client**: Axios (configured with global credentials for secure cookie transmission)
 
 ### Backend
--   **Runtime**: Node.js
--   **Framework**: Express.js
--   **Database**: MongoDB (Mongoose)
--   **Authentication**: JSON Web Tokens (JWT), BCryptJS
--   **File Storage**: Cloudinary, Multer
--   **AI Integration**: Google Generative AI, OpenAI
+* **Runtime**: Node.js (ES Modules)
+* **API Framework**: Express.js
+* **Database**: MongoDB (Mongoose Object Modeling)
+* **Session Security**: JSON Web Tokens, BCryptJS, Cookie-Parser
+* **Caching & Queueing**: Redis, BullMQ
+* **File Storage**: Cloudinary, Multer
+* **Third-Party Integrations**: Google Generative AI, OpenAI
 
-## 📦 Installation
+---
 
-Follow these steps to set up the project locally.
+## Installation and Configuration
+
+Follow these steps to configure and run the project locally.
 
 ### Prerequisites
--   Node.js (v18+ recommended)
--   MongoDB (Local or Atlas URI)
--   Cloudinary Account (for image uploads)
+* Node.js (v18 or higher)
+* MongoDB (Local instance or MongoDB Atlas URI)
+* Redis (Local instance or Upstash Redis connection string)
+* Cloudinary Account (for file storage credentials)
 
 ### 1. Clone the Repository
 ```bash
@@ -48,7 +53,8 @@ git clone https://github.com/kunal5946/Book-Store.git
 cd Book-Store
 ```
 
-### 2. Setup Backend
+### 2. Configure the Backend
+Navigate to the backend directory and install the dependencies:
 ```bash
 cd Backend
 npm install
@@ -56,40 +62,44 @@ npm install
 
 Create a `.env` file in the `Backend` directory with the following variables:
 ```env
-PORT=4001
-mongoDBURI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-OPENAI_API_KEY=your_openai_key_if_used
-GEMINI_API_KEY=your_gemini_key_if_used
+PORT=4000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_signing_secret
+FRONTEND_URL=http://localhost:5173
+REDIS_URL=rediss://default:your_password@your_endpoint.upstash.io:6379
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Start the backend server:
+Start the backend development server (using Nodemon):
 ```bash
 npm start
 ```
 
-### 3. Setup Frontend
-Open a new terminal and navigate to the Frontend directory:
+### 3. Configure the Frontend
+Open a new terminal window, navigate to the frontend directory, and install the dependencies:
 ```bash
 cd Frontend
 npm install
 ```
 
-Start the development server:
+Create a `.env` file in the `Frontend` directory:
+```env
+VITE_API_URL=http://localhost:4000
+```
+
+Start the frontend development server:
 ```bash
 npm run dev
 ```
 
-### 4. Access the App
-Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
+### 4. Access the Application
+Open your browser and navigate to `http://localhost:5173`.
 
-## 🤝 Contributing
+---
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
+## License
 
 This project is licensed under the ISC License.
