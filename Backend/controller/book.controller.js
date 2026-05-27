@@ -128,11 +128,34 @@ export const recommendBooks = async (req, res) => {
       return res.status(400).json({ message: "Prompt required" });
     }
 
+    // 1. Normalization: Lowercase, trim, and replace spaces with underscores to create a standardized cache key
+    const normalizedPrompt = prompt.trim().toLowerCase().replace(/\s+/g, "_");
+    const cacheKey = `ai:rec:${normalizedPrompt}`;
+
+    // 2. Cache-Aside Pattern: Query Redis first to avoid costly AI API queries and minimize latency
+    let cachedData = null;
+    try {
+      cachedData = await redisClient.get(cacheKey);
+    } catch (redisError) {
+      // Defensive Fallback: If Redis is down, log the error but allow the request to proceed directly to MongoDB/AI
+      console.error("Redis read error in recommendBooks, bypassing cache:", redisError);
+    }
+
+    // 3. Cache Hit: Return the stored results instantly (source metadata added for verification)
+    if (cachedData) {
+      const parsed = JSON.parse(cachedData);
+      return res.status(200).json({
+        ...parsed,
+        source: "Redis Cache"
+      });
+    }
+
+    // 4. Cache Miss: Execute the normal database search and AI tagging logic
     let genres = [];
     let tags = [];
     let isFallback = false;
 
-    //  TRY AI FIRST
+    // TRY AI FIRST
     try {
       const aiResult = await generateTagsAndGenres(prompt);
 
@@ -157,67 +180,82 @@ export const recommendBooks = async (req, res) => {
       tags = words;
     }
 
-    //  GET BOOKS
+    // GET BOOKS
     const allBooks = await Book.find();
 
-    //  SCORING
-      const scored = allBooks.map(book => {
-        let score = 0;
+    // SCORING
+    const scored = allBooks.map(book => {
+      let score = 0;
 
-        const bookGenres = (book.genre || []).map(g => g.toLowerCase());
-        const bookTags = (book.tags || []).map(t => t.toLowerCase());
+      const bookGenres = (book.genre || []).map(g => g.toLowerCase());
+      const bookTags = (book.tags || []).map(t => t.toLowerCase());
 
-        // tag match
-        tags.forEach(t => {
-          if (bookTags.some(bt => bt.includes(t))) {
-            score += 5;
-          }
-        });
-
-        // genre match
-        genres.forEach(g => {
-          if (bookGenres.some(bg => bg.includes(g))) {
-            score += 3;
-          }
-        });
-
-        // title match
-        if (book.name.toLowerCase().includes(prompt.toLowerCase())) {
-          score += 8;
+      // tag match
+      tags.forEach(t => {
+        if (bookTags.some(bt => bt.includes(t))) {
+          score += 5;
         }
-
-        return { book, score };
       });
 
-      scored.sort((a, b) => b.score - a.score);
-
-      const result = scored
-        .filter(item => item.score > 0)
-        .map(item => item.book);
-
-      //  ALWAYS RETURN SOMETHING
-      if (result.length === 0) {
-        // If AI failed AND keyword search failed, return random books + message
-        if (isFallback) {
-          return res.json({
-            books: allBooks.slice(0, 6),
-            fallback: true
-          });
+      // genre match
+      genres.forEach(g => {
+        if (bookGenres.some(bg => bg.includes(g))) {
+          score += 3;
         }
-        return res.json({ books: [], fallback: false });
+      });
+
+      // title match
+      if (book.name.toLowerCase().includes(prompt.toLowerCase())) {
+        score += 8;
       }
 
-      res.json({ books: result, fallback: isFallback });
+      return { book, score };
+    });
 
-    } catch (err) {
-      console.log("Recommendation error:", err);
+    scored.sort((a, b) => b.score - a.score);
 
-      //  HARD FALLBACK (never freeze UI)
-      const allBooks = await Book.find();
-      // Return explicit message flag for frontend to handle
-      res.json({
-        books: allBooks.slice(0, 6),
-        fallback: true
-      });
+    const result = scored
+      .filter(item => item.score > 0)
+      .map(item => item.book);
+
+    // Structure response payload
+    let finalResponse;
+    if (result.length === 0) {
+      if (isFallback) {
+        finalResponse = {
+          books: allBooks.slice(0, 6),
+          fallback: true
+        };
+      } else {
+        finalResponse = { books: [], fallback: false };
+      }
+    } else {
+      finalResponse = { books: result, fallback: isFallback };
     }
+
+    // 5. Cache Write: Save the compiled response to Redis with a TTL of 24 Hours (86400 seconds)
+    try {
+      await redisClient.setEx(cacheKey, 86400, JSON.stringify(finalResponse));
+    } catch (redisError) {
+      // Defensive Fallback: If Redis write fails, log the issue but do not block the user response
+      console.error("Redis write error in recommendBooks:", redisError);
+    }
+
+    // Return the response, marking the source as a live calculation
+    res.status(200).json({
+      ...finalResponse,
+      source: "Live API"
+    });
+
+  } catch (err) {
+    console.log("Recommendation error:", err);
+
+    // HARD FALLBACK (never freeze UI)
+    const allBooks = await Book.find();
+    res.status(200).json({
+      books: allBooks.slice(0, 6),
+      fallback: true,
+      source: "Live API (Fallback)"
+    });
+  }
 };
